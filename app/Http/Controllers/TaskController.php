@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Tasks;
 
 use Illuminate\Http\Request;
-use Laravel\Prompts\Task;
-use Psy\Readline\Hoa\Console;
 
 class TaskController extends Controller
 {
@@ -46,5 +44,15 @@ class TaskController extends Controller
                 'total_data' => $taskArray['total']
             ]
         )->setStatusCode(200);
+    }
+
+    public function getDueDateTasks(Request $request) {
+        $userId = $request->input('user_id');
+        $totalTasks = Tasks::where('user_id', $userId)
+            ->whereDate('due_date', now()->toDateString())
+            ->orderBy('due_date', 'asc')
+            ->count();
+
+        return response()->json(['total_data' => $totalTasks, 'error_message' => null])->setStatusCode(200);
     }
 }
