@@ -13,4 +13,5 @@ Route::middleware(ApiAuthMiddleware::class)->group(function () {
     Route::post('/tasks', [TaskController::class, 'create']);
     Route::get('/tasks', [TaskController::class, 'getList']);
     Route::get('/tasks/due-date', [TaskController::class, 'getDueDateTasks']);
+    Route::patch('/tasks/{taskId}/completed', [TaskController::class, 'updateCompletedStatus']);
 });
