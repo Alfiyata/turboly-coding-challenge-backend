@@ -29,4 +29,22 @@ class TaskController extends Controller
         $task->save();
         return response()->json(['data' => $task, 'error_message' => null])->setStatusCode(201);
     }
+
+    public function getList(Request $request) {
+        $page = $request->query('page', 1);
+        $pageSize = $request->query('pageSize', 5);
+        $userId = $request->input('user_id');
+        $tasks = Tasks::where('user_id', $userId)->paginate(perPage: $pageSize, page: $page);
+
+        $taskArray = $tasks->toArray();
+        return response()->json(
+            [
+                'data' => $taskArray['data'],
+                'current_page' => $taskArray['current_page'],
+                'last_page' => $taskArray['last_page'],
+                'per_page' => $taskArray['per_page'],
+                'total_data' => $taskArray['total']
+            ]
+        )->setStatusCode(200);
+    }
 }
