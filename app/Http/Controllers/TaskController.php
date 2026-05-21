@@ -33,11 +33,20 @@ class TaskController extends Controller
         $page = $request->query('page', 1);
         $pageSize = $request->query('pageSize', 5);
         $title = $request->query('title');
+        $priority = $request->query('priority');
+        $due_date = $request->query('due_date');
         $userId = $request->input('user_id');
         $tasks = Tasks::where('user_id', $userId)
             ->when($title, function ($query, string $title) {
                 $query->where('title', 'like', '%' . $title . '%');
             })
+            ->when($priority, function ($query, int $priority) {
+                $query->where('priority', $priority);
+            })
+            ->when($due_date, function ($query, $due_date) {
+                $query->whereDate('due_date', $due_date);
+            })
+            ->orderBy('due_date', 'asc')
             ->paginate(perPage: $pageSize, page: $page);
 
         $taskArray = $tasks->toArray();
