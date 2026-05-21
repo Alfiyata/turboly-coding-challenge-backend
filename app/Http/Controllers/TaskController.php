@@ -32,8 +32,13 @@ class TaskController extends Controller
     {
         $page = $request->query('page', 1);
         $pageSize = $request->query('pageSize', 5);
+        $title = $request->query('title');
         $userId = $request->input('user_id');
-        $tasks = Tasks::where('user_id', $userId)->paginate(perPage: $pageSize, page: $page);
+        $tasks = Tasks::where('user_id', $userId)
+            ->when($title, function ($query, string $title) {
+                $query->where('title', 'like', '%' . $title . '%');
+            })
+            ->paginate(perPage: $pageSize, page: $page);
 
         $taskArray = $tasks->toArray();
         return response()->json(
@@ -52,6 +57,7 @@ class TaskController extends Controller
         $userId = $request->input('user_id');
         $totalTasks = Tasks::where('user_id', $userId)
             ->whereDate('due_date', now()->toDateString())
+            ->where('completed', false)
             ->orderBy('due_date', 'asc')
             ->count();
 
